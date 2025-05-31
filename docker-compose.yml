@@ -1,0 +1,38 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: scarfall-mongodb
+    hostname: mongodb.scarfall.local
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=scarfall
+      - MONGO_INITDB_DATABASE=scarfall-2
+    volumes:
+      - mongodb_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - app-network
+    command: mongod --auth
+
+  redis:
+    image: redis:alpine
+    container_name: scarfall-redis
+    hostname: redis.scarfall.local
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass scarfall@redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+
+volumes:
+  mongodb_data:
+  redis_data:
+
+networks:
+  app-network:
+    name: scarefall
+    external: true
